@@ -1,0 +1,13 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "4.15",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "UE4Protobuf",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
