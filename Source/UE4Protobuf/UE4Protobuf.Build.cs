@@ -26,7 +26,7 @@ public class UE4Protobuf : ModuleRules
         }
         else if (Target.Platform == UnrealTargetPlatform.Android || Target.Platform == UnrealTargetPlatform.Linux)
         {
-
+            Definitions.Add("HAVE_PTHREAD=1");
         }
     }
 }
