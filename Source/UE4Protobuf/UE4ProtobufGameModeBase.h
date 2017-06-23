@@ -14,6 +14,7 @@ class UE4PROTOBUF_API AUE4ProtobufGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 	
 	
-	
-	
+public:
+
+	AUE4ProtobufGameModeBase();
 };
