@@ -9,10 +9,10 @@ A protobuf source integration for UE4.
 * 已测试通过
 	* `Win32`, `Win64`
 	* `Android`
+	* `Mac`
 
 * 未测试
 	* `Linux`
-	* `Mac`
 	
 ## 如何使用 ##
 
