@@ -5,21 +5,10 @@ using System.Collections.Generic;
 
 public class UE4ProtobufTarget : TargetRules
 {
-	public UE4ProtobufTarget(TargetInfo Target)
+	public UE4ProtobufTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
-	}
-
-	//
-	// TargetRules interface.
-	//
-
-	public override void SetupBinaries(
-		TargetInfo Target,
-		ref List<UEBuildBinaryConfiguration> OutBuildBinaryConfigurations,
-		ref List<string> OutExtraModuleNames
-		)
-	{
-		OutExtraModuleNames.AddRange( new string[] { "UE4Protobuf" } );
+		
+		ExtraModuleNames.AddRange( new string[] { "UE4Protobuf" } );
 	}
 }
