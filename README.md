@@ -16,7 +16,7 @@ A protobuf source integration for UE4.
 	
 ## 如何使用 ##
 
-直接将 `google` 文件夹复制到自己的项目源码目录下，并且复制 `UE4Protobuf.Build.cs` 文件中的 `Definitions` 到自己项目的 `.Build.cs` 文件中
+直接将 `google` 文件夹复制到自己的项目源码目录下即可
 
 ## 以下记录完整步骤 ##
 
