@@ -100,7 +100,7 @@ return NULL;
 改为
 
 ``` cpp
-bool ok = &T::default_instance9) == from->GetReflection()->GetMessageFactory()->GetPrototype(from->GetDescriptor());
+bool ok = &T::default_instance() == from->GetReflection()->GetMessageFactory()->GetPrototype(from->GetDescriptor());
 return ok ? down_cast<T*>(from) : NULL;
 ```
 
