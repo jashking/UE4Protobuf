@@ -90,7 +90,7 @@ return NULL;
 
 ``` cpp
 #if defined(GOOGLE_PROTOBUF_NO_RTTI) || (defined(_MSC_VER)&&!defined(_CPPRTTI))
-	bool ok = &T::default_instance9) == from->GetReflection()->GetMessageFactory()->GetPrototype(from->GetDescriptor());
+	bool ok = &T::default_instance() == from->GetReflection()->GetMessageFactory()->GetPrototype(from->GetDescriptor());
 		return ok ? down_cast<T*>(from) : NULL;
 #else
 	return dynamic_cast<To>(from);
