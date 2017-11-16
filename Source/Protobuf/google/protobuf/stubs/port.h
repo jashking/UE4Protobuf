@@ -70,7 +70,7 @@
     #define PROTOBUF_LITTLE_ENDIAN 1
   #endif
 #endif
-#if defined(_MSC_VER) && defined(PROTOBUF_USE_DLLS)
+#if defined(_MSC_VER) && defined(PROTOBUF_API)//defined(PROTOBUF_USE_DLLS)
 #ifdef LIBPROTOBUF_EXPORTS
 #define LIBPROTOBUF_EXPORT __declspec(dllexport)
 #else
@@ -84,6 +84,12 @@
 #else
 #define LIBPROTOBUF_EXPORT
 #define LIBPROTOC_EXPORT
+
+#ifdef PROTOBUF_API
+#undef PROTOBUF_API
+#define PROTOBUF_API
+#endif // PROTOBUF_API
+
 #endif
 
 // These #includes are for the byte swap functions declared later on.
