@@ -9,14 +9,15 @@ A protobuf source integration for UE4.
 * 已测试通过
 	* `Win32`, `Win64`
 	* `Android`
-	* `Mac`
 
 * 未测试
 	* `Linux`
-	
+	* `Mac`
+
 ## 如何使用 ##
 
-直接将 `google` 文件夹复制到自己的项目源码目录下即可
+* 将 `Source\Protobuf` 文件夹复制到自己的项目的`Source`目录下
+* 修改自己项目的 `.build.cs` 文件，在 `PublicDependencyModuleNames` 中增加 `Protobuf` 模块，并增加 `bEnableShadowVariableWarnings = false; bEnableUndefinedIdentifierWarnings = false;`，禁掉警告
 
 ## 以下记录完整步骤 ##
 
@@ -121,6 +122,26 @@ return ok ? down_cast<T*>(from) : NULL;
 #endif
 ```
 
+### 替换 LIBPROTOBUF_EXPORT 宏 ###
+
+将代码里除 `google/protobuf/stubs/port.h` 中的 `LIBPROTOBUF_EXPORT` 宏替换为 `PROTOBUF_API`
+将代码里的两处 `#elif defined(PROTOBUF_USE_DLLS)` 替换为 `#elif defined(PROTOBUF_API)`
+
 ### 禁用编译警告 ###
 
 因为 `UE4` 会将一些编译警告当成错误，所以要将编译过程中 `libprotobuf` 中的警告禁用掉
+
+在 `Protobuf` 模块的编译描述文件 `Protobuf.build.cs` 中增加
+
+``` cpp
+bEnableShadowVariableWarnings = false;
+bEnableUndefinedIdentifierWarnings = false;
+```
+
+在 `google/protobuf/map_field.h` 文件开头增加 
+
+``` cpp
+#ifdef _MSC_VER
+#pragma warning(disable: 4661)
+#endif //_MSC_VER
+```
