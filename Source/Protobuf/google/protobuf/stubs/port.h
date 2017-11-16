@@ -85,10 +85,12 @@
 #define LIBPROTOBUF_EXPORT
 #define LIBPROTOC_EXPORT
 
+#if defined(__APPLE__)
 #ifdef PROTOBUF_API
 #undef PROTOBUF_API
 #define PROTOBUF_API
 #endif // PROTOBUF_API
+#endif // __APPLE__
 
 #endif
 
