@@ -15,7 +15,7 @@ AUE4ProtobufGameModeBase::AUE4ProtobufGameModeBase()
 
 	const std::string Message = Request.SerializeAsString();
 
-	UE_LOG(LogTemp, Error, TEXT("Test protobuf, Request size[%d]."), Message.size());
+	UE_LOG(LogTemp, Display, TEXT("Test protobuf, Request size[%d]."), Message.size());
 }
 
 
