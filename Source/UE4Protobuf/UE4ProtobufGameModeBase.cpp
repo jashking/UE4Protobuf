@@ -2,6 +2,7 @@
 
 #include "UE4Protobuf.h"
 #include "UE4ProtobufGameModeBase.h"
+
 #include "Proto/Test.pb.h"
 
 AUE4ProtobufGameModeBase::AUE4ProtobufGameModeBase()
@@ -11,6 +12,10 @@ AUE4ProtobufGameModeBase::AUE4ProtobufGameModeBase()
 	Request.set_query("test");
 	Request.set_page_number(1);
 	Request.set_result_per_page(2);
+
+	const std::string Message = Request.SerializeAsString();
+
+	UE_LOG(LogTemp, Error, TEXT("Test protobuf, Request size[%d]."), Message.size());
 }
 
 

@@ -2,13 +2,15 @@
 
 using UnrealBuildTool;
 
-public class UE4Protobuf : ModuleRules
+public class Protobuf : ModuleRules
 {
-	public UE4Protobuf(ReadOnlyTargetRules Target) : base(Target)
+	public Protobuf(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Protobuf" });
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+	
+		PublicDependencyModuleNames.AddRange(new string[] { "Core" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+		PrivateDependencyModuleNames.AddRange(new string[] { });
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
@@ -18,13 +20,12 @@ public class UE4Protobuf : ModuleRules
 
 		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
 
-		// Protobuf source integrationg
 		bEnableShadowVariableWarnings = false;
 		bEnableUndefinedIdentifierWarnings = false;
 
 		if (Target.Platform == UnrealTargetPlatform.Win32 || Target.Platform == UnrealTargetPlatform.Win64)
-        {
-            Definitions.Add("_CRT_SECURE_NO_WARNINGS");
-        }
-    }
+		{
+			Definitions.Add("_CRT_SECURE_NO_WARNINGS");
+		}
+	}
 }
