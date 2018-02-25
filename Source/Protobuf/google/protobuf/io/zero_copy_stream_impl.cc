@@ -32,9 +32,7 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#ifdef _MSC_VER
-#include <io.h>
-#else
+#ifndef _MSC_VER
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -43,15 +41,12 @@
 #include <errno.h>
 #include <iostream>
 #include <algorithm>
-
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/stl_util.h>
+#include <google/protobuf/stubs/io_win32.h>
 
-#ifdef _MSC_VER
-#pragma warning(disable: 4996)
-#endif //_MSC_VER
 
 namespace google {
 namespace protobuf {
@@ -61,6 +56,13 @@ namespace io {
 // Win32 lseek is broken:  If invoked on a non-seekable file descriptor, its
 // return value is undefined.  We re-define it to always produce an error.
 #define lseek(fd, offset, origin) ((off_t)-1)
+// DO NOT include <io.h>, instead create functions in io_win32.{h,cc} and import
+// them like we do below.
+using google::protobuf::internal::win32::access;
+using google::protobuf::internal::win32::close;
+using google::protobuf::internal::win32::open;
+using google::protobuf::internal::win32::read;
+using google::protobuf::internal::win32::write;
 #endif
 
 namespace {
@@ -83,8 +85,6 @@ FileInputStream::FileInputStream(int file_descriptor, int block_size)
   : copying_input_(file_descriptor),
     impl_(&copying_input_, block_size) {
 }
-
-FileInputStream::~FileInputStream() {}
 
 bool FileInputStream::Close() {
   return copying_input_.Close();
@@ -118,7 +118,7 @@ FileInputStream::CopyingFileInputStream::CopyingFileInputStream(
 FileInputStream::CopyingFileInputStream::~CopyingFileInputStream() {
   if (close_on_delete_) {
     if (!Close()) {
-      GOOGLE_LOG(ERROR) << "close() failed: " << strerror(errno_);
+      GOOGLE_LOG(ERROR) << "close() failed: " << errno_;
     }
   }
 }
@@ -216,7 +216,7 @@ FileOutputStream::CopyingFileOutputStream::CopyingFileOutputStream(
 FileOutputStream::CopyingFileOutputStream::~CopyingFileOutputStream() {
   if (close_on_delete_) {
     if (!Close()) {
-      GOOGLE_LOG(ERROR) << "close() failed: " << strerror(errno_);
+      GOOGLE_LOG(ERROR) << "close() failed: " << errno_;
     }
   }
 }
@@ -275,8 +275,6 @@ bool FileOutputStream::CopyingFileOutputStream::Write(
 
 IstreamInputStream::IstreamInputStream(std::istream* input, int block_size)
     : copying_input_(input), impl_(&copying_input_, block_size) {}
-
-IstreamInputStream::~IstreamInputStream() {}
 
 bool IstreamInputStream::Next(const void** data, int* size) {
   return impl_.Next(data, size);
@@ -349,9 +347,6 @@ bool OstreamOutputStream::CopyingOstreamOutputStream::Write(
 ConcatenatingInputStream::ConcatenatingInputStream(
     ZeroCopyInputStream* const streams[], int count)
   : streams_(streams), stream_count_(count), bytes_retired_(0) {
-}
-
-ConcatenatingInputStream::~ConcatenatingInputStream() {
 }
 
 bool ConcatenatingInputStream::Next(const void** data, int* size) {

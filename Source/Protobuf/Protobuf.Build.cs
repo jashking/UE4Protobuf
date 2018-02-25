@@ -23,9 +23,6 @@ public class Protobuf : ModuleRules
 		bEnableShadowVariableWarnings = false;
 		bEnableUndefinedIdentifierWarnings = false;
 
-		if (Target.Platform == UnrealTargetPlatform.Win32 || Target.Platform == UnrealTargetPlatform.Win64)
-		{
-			Definitions.Add("_CRT_SECURE_NO_WARNINGS");
-		}
+		Definitions.Add("_CRT_SECURE_NO_WARNINGS");
 	}
 }

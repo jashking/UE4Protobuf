@@ -28,31 +28,33 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef GOOGLE_PROTOBUF_UTIL_CONVERTER_MOCK_ERROR_LISTENER_H__
-#define GOOGLE_PROTOBUF_UTIL_CONVERTER_MOCK_ERROR_LISTENER_H__
+#ifndef GOOGLE_PROTOBUF_UTIL_CONVERTER_LOCATION_TRACKER_H__
+#define GOOGLE_PROTOBUF_UTIL_CONVERTER_LOCATION_TRACKER_H__
 
-#include <google/protobuf/stubs/stringpiece.h>
-#include <google/protobuf/util/internal/error_listener.h>
-#include <google/protobuf/util/internal/location_tracker.h>
-#include <gmock/gmock.h>
+#include <string>
+
+#include <google/protobuf/stubs/common.h>
 
 namespace google {
 namespace protobuf {
 namespace util {
 namespace converter {
 
-class MockErrorListener : public ErrorListener {
+// LocationTrackerInterface is an interface for classes that track
+// the location information for the purpose of error reporting.
+class LIBPROTOBUF_EXPORT LocationTrackerInterface {
  public:
-  MockErrorListener() {}
-  virtual ~MockErrorListener() {}
+  virtual ~LocationTrackerInterface() {}
 
-  MOCK_METHOD3(InvalidName, void(const LocationTrackerInterface& loc,
-                                 StringPiece unknown_name,
-                                 StringPiece message));
-  MOCK_METHOD3(InvalidValue, void(const LocationTrackerInterface& loc,
-                                  StringPiece type_name, StringPiece value));
-  MOCK_METHOD2(MissingField, void(const LocationTrackerInterface& loc,
-                                  StringPiece missing_name));
+  // Returns the object location as human readable string.
+  virtual string ToString() const = 0;
+
+ protected:
+  LocationTrackerInterface() {}
+
+ private:
+  // Please do not add any data members to this class.
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(LocationTrackerInterface);
 };
 
 }  // namespace converter
@@ -60,4 +62,4 @@ class MockErrorListener : public ErrorListener {
 }  // namespace protobuf
 
 }  // namespace google
-#endif  // GOOGLE_PROTOBUF_UTIL_CONVERTER_MOCK_ERROR_LISTENER_H__
+#endif  // GOOGLE_PROTOBUF_UTIL_CONVERTER_LOCATION_TRACKER_H__

@@ -44,6 +44,8 @@
 #include <stdint.h>
 #endif
 
+#include <google/protobuf/stubs/platform_macros.h>
+
 #undef PROTOBUF_LITTLE_ENDIAN
 #ifdef _WIN32
   // Assuming windows is always little-endian.
@@ -70,24 +72,20 @@
     #define PROTOBUF_LITTLE_ENDIAN 1
   #endif
 #endif
-#if defined(_MSC_VER) && defined(PROTOBUF_API)//defined(PROTOBUF_USE_DLLS)
-#ifdef LIBPROTOBUF_EXPORTS
-#define LIBPROTOBUF_EXPORT __declspec(dllexport)
+#if defined(_MSC_VER) && defined(PROTOBUF_API)
+  #ifdef LIBPROTOBUF_EXPORTS
+    #define LIBPROTOBUF_EXPORT __declspec(dllexport)
+  #else
+    #define LIBPROTOBUF_EXPORT __declspec(dllimport)
+  #endif
+  #ifdef LIBPROTOC_EXPORTS
+    #define LIBPROTOC_EXPORT   __declspec(dllexport)
+  #else
+    #define LIBPROTOC_EXPORT   __declspec(dllimport)
+  #endif
 #else
-#define LIBPROTOBUF_EXPORT __declspec(dllimport)
-#endif
-#ifdef LIBPROTOC_EXPORTS
-#define LIBPROTOC_EXPORT   __declspec(dllexport)
-#else
-#define LIBPROTOC_EXPORT   __declspec(dllimport)
-#endif
-#else
-#define LIBPROTOBUF_EXPORT
-#define LIBPROTOC_EXPORT
-
-#undef PROTOBUF_API
-#define PROTOBUF_API
-
+  #define LIBPROTOBUF_EXPORT
+  #define LIBPROTOC_EXPORT
 #endif
 
 // These #includes are for the byte swap functions declared later on.
@@ -99,6 +97,8 @@
 #include <byteswap.h>  // IWYU pragma: export
 #endif
 
+#define PROTOBUF_RUNTIME_DEPRECATED(message)
+
 // ===================================================================
 // from google3/base/port.h
 
@@ -108,6 +108,18 @@
 // undefined otherwise.  Do NOT define it to 0 -- that causes
 // '#ifdef LANG_CXX11' to behave differently from '#if LANG_CXX11'.
 #define LANG_CXX11 1
+#endif
+
+#if LANG_CXX11 && !defined(__NVCC__)
+#define PROTOBUF_CXX11 1
+#else
+#define PROTOBUF_CXX11 0
+#endif
+
+#if PROTOBUF_CXX11
+#define PROTOBUF_FINAL final
+#else
+#define PROTOBUF_FINAL
 #endif
 
 namespace google {
@@ -179,6 +191,8 @@ static const uint64 kuint64max = GOOGLE_ULONGLONG(0xFFFFFFFFFFFFFFFF);
 #endif
 #endif
 
+#define GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE GOOGLE_ATTRIBUTE_ALWAYS_INLINE
+
 #ifndef GOOGLE_ATTRIBUTE_NOINLINE
 #if defined(__GNUC__) && (__GNUC__ > 3 ||(__GNUC__ == 3 && __GNUC_MINOR__ >= 1))
 // For functions we want to force not inline.
@@ -193,23 +207,7 @@ static const uint64 kuint64max = GOOGLE_ULONGLONG(0xFFFFFFFFFFFFFFFF);
 #endif
 #endif
 
-#ifndef GOOGLE_ATTRIBUTE_NORETURN
-#ifdef __GNUC__
-// Tell the compiler that a given function never returns.
-#define GOOGLE_ATTRIBUTE_NORETURN __attribute__((noreturn))
-#else
-#define GOOGLE_ATTRIBUTE_NORETURN
-#endif
-#endif
-
-#ifndef GOOGLE_ATTRIBUTE_DEPRECATED
-#ifdef __GNUC__
-// If the method/variable/type is used anywhere, produce a warning.
-#define GOOGLE_ATTRIBUTE_DEPRECATED __attribute__((deprecated))
-#else
-#define GOOGLE_ATTRIBUTE_DEPRECATED
-#endif
-#endif
+#define GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE GOOGLE_ATTRIBUTE_NOINLINE
 
 #ifndef GOOGLE_PREDICT_TRUE
 #ifdef __GNUC__
@@ -245,6 +243,8 @@ static const uint64 kuint64max = GOOGLE_ULONGLONG(0xFFFFFFFFFFFFFFFF);
      __has_cpp_attribute(clang::fallthrough)
 #  define GOOGLE_FALLTHROUGH_INTENDED [[clang::fallthrough]]
 # endif
+#elif defined(__GNUC__) && __GNUC__ > 6
+# define GOOGLE_FALLTHROUGH_INTENDED [[gnu::fallthrough]]
 #endif
 
 #ifndef GOOGLE_FALLTHROUGH_INTENDED
@@ -254,9 +254,59 @@ static const uint64 kuint64max = GOOGLE_ULONGLONG(0xFFFFFFFFFFFFFFFF);
 #define GOOGLE_GUARDED_BY(x)
 #define GOOGLE_ATTRIBUTE_COLD
 
-// x86 and x86-64 can perform unaligned loads/stores directly.
-#if defined(_M_X64) || defined(__x86_64__) || \
-    defined(_M_IX86) || defined(__i386__)
+#ifdef GOOGLE_PROTOBUF_DONT_USE_UNALIGNED
+# define GOOGLE_PROTOBUF_USE_UNALIGNED 0
+#else
+# if defined(_M_X64) || defined(__x86_64__) || defined(_M_IX86) || defined(__i386__)
+#  define GOOGLE_PROTOBUF_USE_UNALIGNED 1
+# else
+#  define GOOGLE_PROTOBUF_USE_UNALIGNED 0
+# endif
+#endif
+
+#define GOOGLE_PROTOBUF_ATTRIBUTE_COLD GOOGLE_ATTRIBUTE_COLD
+
+#if defined(ADDRESS_SANITIZER) || defined(THREAD_SANITIZER) ||\
+    defined(MEMORY_SANITIZER)
+
+#ifdef __cplusplus
+extern "C" {
+#endif  // __cplusplus
+uint16_t __sanitizer_unaligned_load16(const void *p);
+uint32_t __sanitizer_unaligned_load32(const void *p);
+uint64_t __sanitizer_unaligned_load64(const void *p);
+void __sanitizer_unaligned_store16(void *p, uint16_t v);
+void __sanitizer_unaligned_store32(void *p, uint32_t v);
+void __sanitizer_unaligned_store64(void *p, uint64_t v);
+#ifdef __cplusplus
+}  // extern "C"
+#endif  // __cplusplus
+
+inline uint16 GOOGLE_UNALIGNED_LOAD16(const void *p) {
+  return __sanitizer_unaligned_load16(p);
+}
+
+inline uint32 GOOGLE_UNALIGNED_LOAD32(const void *p) {
+  return __sanitizer_unaligned_load32(p);
+}
+
+inline uint64 GOOGLE_UNALIGNED_LOAD64(const void *p) {
+  return __sanitizer_unaligned_load64(p);
+}
+
+inline void GOOGLE_UNALIGNED_STORE16(void *p, uint16 v) {
+  __sanitizer_unaligned_store16(p, v);
+}
+
+inline void GOOGLE_UNALIGNED_STORE32(void *p, uint32 v) {
+  __sanitizer_unaligned_store32(p, v);
+}
+
+inline void GOOGLE_UNALIGNED_STORE64(void *p, uint64 v) {
+  __sanitizer_unaligned_store64(p, v);
+}
+
+#elif GOOGLE_PROTOBUF_USE_UNALIGNED
 
 #define GOOGLE_UNALIGNED_LOAD16(_p) (*reinterpret_cast<const uint16 *>(_p))
 #define GOOGLE_UNALIGNED_LOAD32(_p) (*reinterpret_cast<const uint32 *>(_p))
@@ -350,7 +400,7 @@ class Bits {
  public:
   static uint32 Log2FloorNonZero(uint32 n) {
 #if defined(__GNUC__)
-  return 31 ^ __builtin_clz(n);
+  return 31 ^ static_cast<uint32>(__builtin_clz(n));
 #elif defined(COMPILER_MSVC) && defined(_M_IX86)
   _asm {
     bsr ebx, n
@@ -362,9 +412,14 @@ class Bits {
 #endif
   }
 
-  static uint64 Log2FloorNonZero64(uint64 n) {
-#if defined(__GNUC__)
-  return 63 ^ __builtin_clzll(n);
+  static uint32 Log2FloorNonZero64(uint64 n) {
+    // arm-nacl-clang runs into an instruction-selection failure when it
+    // encounters __builtin_clzll:
+    // https://bugs.chromium.org/p/nativeclient/issues/detail?id=4395
+    // To work around this, when we build for NaCl we use the portable
+    // implementation instead.
+#if defined(__GNUC__) && !defined(GOOGLE_PROTOBUF_OS_NACL)
+  return 63 ^ static_cast<uint32>(__builtin_clzll(n));
 #else
   return Log2FloorNonZero64_Portable(n);
 #endif
@@ -391,9 +446,9 @@ class Bits {
     const uint32 topbits = static_cast<uint32>(n >> 32);
     if (topbits == 0) {
       // Top bits are zero, so scan in bottom bits
-      return Log2FloorNonZero(static_cast<uint32>(n));
+      return static_cast<int>(Log2FloorNonZero(static_cast<uint32>(n)));
     } else {
-      return 32 + Log2FloorNonZero(topbits);
+      return 32 + static_cast<int>(Log2FloorNonZero(topbits));
     }
   }
 };
@@ -457,6 +512,12 @@ class BigEndian {
     GOOGLE_UNALIGNED_STORE64(p, FromHost64(v));
   }
 };
+
+#ifndef GOOGLE_ATTRIBUTE_SECTION_VARIABLE
+#define GOOGLE_ATTRIBUTE_SECTION_VARIABLE(name)
+#endif
+
+#define GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(name)
 
 }  // namespace protobuf
 }  // namespace google

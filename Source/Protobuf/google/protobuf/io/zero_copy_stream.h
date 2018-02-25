@@ -123,8 +123,8 @@ class ZeroCopyOutputStream;
 // copying.
 class PROTOBUF_API ZeroCopyInputStream {
  public:
-  inline ZeroCopyInputStream() {}
-  virtual ~ZeroCopyInputStream();
+  ZeroCopyInputStream() {}
+  virtual ~ZeroCopyInputStream() {}
 
   // Obtains a chunk of data from the stream.
   //
@@ -180,8 +180,8 @@ class PROTOBUF_API ZeroCopyInputStream {
 // copying.
 class PROTOBUF_API ZeroCopyOutputStream {
  public:
-  inline ZeroCopyOutputStream() {}
-  virtual ~ZeroCopyOutputStream();
+  ZeroCopyOutputStream() {}
+  virtual ~ZeroCopyOutputStream() {}
 
   // Obtains a buffer into which data can be written.  Any data written
   // into this buffer will eventually (maybe instantly, maybe later on)
