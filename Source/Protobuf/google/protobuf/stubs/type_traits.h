@@ -74,14 +74,14 @@ struct is_base_of {
   typedef char (&no)[2];
 
   // BEGIN GOOGLE LOCAL MODIFICATION -- check is a #define on Mac.
-  #undef check
+  // #undef check
   // END GOOGLE LOCAL MODIFICATION
 
-  static yes check(const B*);
-  static no check(const void*);
+  static yes g_check(const B*);
+  static no g_check(const void*);
 
   enum {
-    value = sizeof(check(static_cast<const D*>(NULL))) == sizeof(yes),
+    value = sizeof(g_check(static_cast<const D*>(NULL))) == sizeof(yes),
   };
 };
 

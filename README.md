@@ -10,6 +10,7 @@ A protobuf source integration for UE4.
 	* `Win32`, `Win64`
 	* `Android`
 	* `MAC`
+	* `iOS`
 
 * 未测试
 	* `Linux`
@@ -144,4 +145,21 @@ bEnableUndefinedIdentifierWarnings = false;
 #ifdef _MSC_VER
 #pragma warning(disable: 4661)
 #endif //_MSC_VER
+```
+
+### `check` 宏冲突问题 ###
+
+打开 `google/protobuf/stubs/type_traits.h`，将 `check` 宏改名为 `g_check`，如下
+
+``` cpp
+// BEGIN GOOGLE LOCAL MODIFICATION -- check is a #define on Mac.
+// #undef check
+// END GOOGLE LOCAL MODIFICATION
+
+static yes g_check(const B*);
+static no g_check(const void*);
+
+enum {
+	value = sizeof(g_check(static_cast<const D*>(NULL))) == sizeof(yes),
+};
 ```
