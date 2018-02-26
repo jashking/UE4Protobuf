@@ -86,6 +86,9 @@
 #else
   #define LIBPROTOBUF_EXPORT
   #define LIBPROTOC_EXPORT
+
+  #undef PROTOBUF_API
+  #define PROTOBUF_API
 #endif
 
 // These #includes are for the byte swap functions declared later on.
