@@ -22,6 +22,7 @@ public class Protobuf : ModuleRules
 
 		bEnableShadowVariableWarnings = false;
 		bEnableUndefinedIdentifierWarnings = false;
+		bEnableExceptions = true;
 
 		Definitions.Add("_CRT_SECURE_NO_WARNINGS");
 	}

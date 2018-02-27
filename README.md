@@ -163,3 +163,17 @@ enum {
 	value = sizeof(g_check(static_cast<const D*>(NULL))) == sizeof(yes),
 };
 ```
+
+### `noexcept` 关键字问题 ###
+
+`Protobuf` 从 `3.5` 版本开始，逐渐使用 `C++11` 语法，其中就使用了 `noexcept` 关键字，但是在虚幻中默认是不使用异常处理的，这样就会导致编译失败，错误为
+
+```bash
+error C4577: 在未指定异常处理模式的情况下使用了 "noexcept"；不一定会在异常时终止。指定 /EHsc
+```
+
+有以下几种改法
+
+* 第一种是在 `build.cs` 中打开 `bEnableExceptions` 开关，本文中就是使用了这个方法
+* 第二种是将 `noexcept` 关键字删掉，不过这样也需要修改 `protoc` 的源码，保证生成出来的 `.pb.h/.pb.cc` 中也没有 `noexcept`
+* 第三种是修改 `UBT` 源码，加入 `/EHsc` 标记，这种不推荐

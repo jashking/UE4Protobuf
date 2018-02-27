@@ -21,6 +21,7 @@ public class UE4Protobuf : ModuleRules
 		// Protobuf source integrationg
 		bEnableShadowVariableWarnings = false;
 		bEnableUndefinedIdentifierWarnings = false;
+		bEnableExceptions = true;
 
 		if (Target.Platform == UnrealTargetPlatform.Win32 || Target.Platform == UnrealTargetPlatform.Win64)
         {
